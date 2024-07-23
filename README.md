@@ -39,6 +39,17 @@ conda install empanada-dl
 mamba install -c pytorch -c conda-forge micro_sam
 ```
 
+Then, navigate to the directory you wish to operate from and run:
+
+```bash
+git clone https://github.com/jamesdimartino/Emp2mSAM.git
+cd Emp2mSAM
+cd scripts
+```
+
+Now, you can run the pipeline end-to-end or stepwise:
+
+
 ---
 
 ## End-to-End Pipeline Script Documentation (pipeline.py)
@@ -138,9 +149,9 @@ python samboxes.py <input_dir> <empanada_dir> <output_dir> --enlargement_factor 
 
 ---
 
-## SAM Points Extraction Script Documentation (sampoints.py)
+## SAM Points Script Documentation (sampoints.py)
 
-This script extracts points and centroids from SAM results, filters small masks, and runs SAM inference again.
+This script filters small masks, obtains centroids from them, and runs SAM inference again.
 
 ### Functions
 

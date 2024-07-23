@@ -176,7 +176,10 @@ def main():
     args = parse_args()
     input_dir = args.input_dir
     output_dir = args.output_dir
-    config_path = "/hpc/mydata/james.dimartino/Emp2mSAM/empavars/configs/inference.yaml"  # Hardcoded path to empanada config
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Construct the path to the config.yaml file
+    config_path = os.path.join(script_dir, 'configs', 'empanada_config.yaml') # Hardcoded path to empanada config
 
     os.makedirs(output_dir, exist_ok=True)
     process_tiles(input_dir, config_path, output_dir, args)

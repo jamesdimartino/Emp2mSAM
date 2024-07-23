@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation for Tile Merging Scripts</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2, h3, h4, h5, h6 {
+            margin-top: 20px;
+        }
+        pre {
+            background: #333;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            overflow: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Comprehensive Documentation for Tile Merging Scripts</h1>
+
+        <hr>
+
+        <h2>Overview</h2>
+        <p>This documentation provides detailed information about two scripts: <code>mergealltiles.py</code> and <code>mergetile.py</code>. These scripts are designed to process and merge tiles using various segmentation and tracking utilities. The first script, <code>mergealltiles.py</code>, iterates over all tiles in a directory and runs the merging process on each. The second script, <code>mergetile.py</code>, processes a single tile, applying preprocessing, gap closing, and segmentation merging steps.</p>
+
+        <hr>
+
+        <h2>Script: <code>mergealltiles.py</code></h2>
+        
+        <h3>Description:</h3>
+        <p>This script iterates over all tile files in a given input directory and processes each tile using the <code>mergetile.py</code> script. It handles the overall management of tile processing and saving the merged results.</p>
+
+        <h3>Functions:</h3>
+
+        <h4><code>parse_args()</code></h4>
+        <p>Parses command line arguments for the script.</p>
+        <h5>Returns:</h5>
+        <ul>
+            <li><code>argparse.Namespace</code>: Parsed command line arguments.</li>
+        </ul>
+
+        <h4><code>main()</code></h4>
+        <p>Main function to merge tiles using the <code>mergetile.py</code> script.</p>
+        <h5>Parameters:</h5>
+        <ul>
+            <li><code>input_dir (str)</code>: Directory containing input tiles.</li>
+            <li><code>output_dir (str)</code>: Directory to save merged tiles.</li>
+        </ul>
+        <h5>Detailed Steps:</h5>
+        <ol>
+            <li>Parse command line arguments.</li>
+            <li>Create the output directory if it does not exist.</li>
+            <li>Iterate over all tile files in the input directory.</li>
+            <li>Run the <code>mergetile.py</code> script for each tile file.</li>
+        </ol>
+
+        <hr>
+
+        <h2>Script: <code>mergetile.py</code></h2>
+        
+        <h3>Description:</h3>
+        <p>This script processes a single tile, applying preprocessing, gap closing, and segmentation merging steps. It includes functions to manage memory usage, preprocess tiles, compute edges and costs, and perform multicut decomposition.</p>
+
+        <h3>Functions:</h3>
+
+        <h4><code>print_memory_usage(stage)</code></h4>
+        <p>Logs the current memory usage of the process to monitor memory management during different stages of processing.</p>
+        <h5>Parameters:</h5>
+        <ul>
+            <li><code>stage (str)</code>: A string indicating the current stage of processing.</li>
+        </ul>
+
+        <h4><code>_preprocess_closing(slice_segmentation, gap_closing)</code></h4>
+        <p>Performs gap closing on the input slice segmentation to close small gaps in the initial segmentation.</p>
+        <h5>Parameters:</h5>
+        <ul>
+            <li><code>slice_segmentation (numpy.ndarray)</code>: The input slice segmentation data.</li>
+            <li><code>gap_closing (int)</code>: Number of iterations for binary closing.</li>
+        </ul>
+        <h5>Returns:</h5>
+        <ul>
+            <li><code>numpy.ndarray</code>: The new segmentation after gap closing.</li>
+        </ul>
+
+        <h4><code>process_tile(tile_path, output_dir, gap_closing=3, min_z_extent=5, beta=0.5)</code></h4>
+        <p>Processes a single tile by loading it, applying preprocessing steps, computing edges and costs, performing multicut decomposition, and saving the merged tile.</p>
+        <h5>Parameters:</h5>
+        <ul>
+            <li><code>tile_path (str)</code>: Path to the tile file.</li>
+            <li><code>output_dir (str)</code>: Directory to save the processed tile.</li>
+            <li><code>gap_closing (int)</code>: Number of iterations for binary closing (default is 3).</li>
+            <li><code>min_z_extent (int)</code>: Minimum z extent for filtering small segments (default is 5).</li>
+            <li><code>beta (float)</code>: Parameter for multicut decomposition (default is 0.5).</li>
+        </ul>
+
+        <h4><code>main()</code></h4>
+        <p>Main function to process a single tile and merge segmentations.</p>
+        <h5>Detailed Steps:</h5>
+        <ol>
+            <li>Parse command line arguments.</li>
+            <li>Call <code>process_tile</code> with the tile path and output directory.</li>
+        </ol>
+
+        <hr>
+
+        <h2>Example Usage</h2>
+        <p>To run <code>mergealltiles.py</code>, use the following command:</p>
+        <pre><code>python mergealltiles.py /path/to/input_dir /path/to/output_dir</code></pre>
+
+        <p>To run <code>mergetile.py</code>, use the following command:</p>
+        <pre><code>python mergetile.py /path/to/tile.npy /path/to/output_dir</code></pre>
+
+    </div>
+</body>
+</html>

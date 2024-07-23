@@ -50,19 +50,18 @@ def load_sam_results(sam_dir):
     logging.info(f"Loaded {len(sam_results)} SAM result files.")
     return sam_results
 
-def extract_centroids_and_points(sam_results, min_area=2000):
+def extract_centroids_and_points(sam_results):
     """
-    Extracts centroids and points from SAM results for small masks and removes small masks.
+    Extracts centroids and points from SAM results.
 
     Args:
         sam_results (list of np.ndarray): List of SAM result files.
-        min_area (int): Minimum area threshold for masks to be retained.
 
     Returns:
         tuple:
             - all_points (list): List of points for small masks.
             - all_point_labels (list): List of point labels for small masks.
-            - cleaned_sam_results (list of np.ndarray): List of cleaned SAM results with small masks removed.
+            - cleaned_sam_results (list of np.ndarray): List of cleaned SAM results with all masks retained.
     """
     logging.info("Extracting centroids and points from SAM results...")
     all_points = []
@@ -79,13 +78,11 @@ def extract_centroids_and_points(sam_results, min_area=2000):
             cleaned_slice = np.zeros_like(z_slice)
             instance_number = 1
             for prop in props:
-                if prop.area < min_area:
-                    centroid = prop.centroid
-                    slice_points.append([[centroid[1], centroid[0]]])  # X, Y coordinates
-                    slice_point_labels.append([1])  # Positive prompt
-                else:
-                    cleaned_slice[z_slice == prop.label] = instance_number
-                    instance_number += 1
+                centroid = prop.centroid
+                slice_points.append([[centroid[1], centroid[0]]])  # X, Y coordinates
+                slice_point_labels.append([1])  # Positive prompt
+                cleaned_slice[z_slice == prop.label] = instance_number
+                instance_number += 1
             tile_points.append(slice_points)
             tile_point_labels.append(slice_point_labels)
             cleaned_tile.append(cleaned_slice)
@@ -159,7 +156,7 @@ def process_and_save_tile(predictor, raw_tile, points, point_labels, cleaned_sam
     logging.info(f"SAM results saved to {output_path}")
     del concatenated_results  # Clear memory
 
-def main(sam_dir, raw_dir, output_dir):
+def main(sam_dir, raw_dir, output_dir, min_seg_size):
     """
     Main function to run the SAM inference pipeline.
 
@@ -172,7 +169,7 @@ def main(sam_dir, raw_dir, output_dir):
     logging.info(f"Using device: {device}")
 
     sam_results = load_sam_results(sam_dir)
-    points, point_labels, cleaned_sam_results = extract_centroids_and_points(sam_results, min_area=2000)
+    points, point_labels, cleaned_sam_results = extract_centroids_and_points(sam_results)
 
     predictor = util.get_sam_model("vit_l_em_organelles", device=device)
 
@@ -196,10 +193,10 @@ def parse_args():
     parser.add_argument('sam_dir', type=str, help='Directory containing SAM1 results')
     parser.add_argument('raw_dir', type=str, help='Directory containing raw tile images')
     parser.add_argument('output_dir', type=str, help='Directory to save SAM2 results')
+    parser.add_argument('min_seg_size', type=int, help='Minimum pixel area for a mask to be re-run with a point prompt')
     return parser.parse_args()
 
 if __name__ == "__main__":
     args = parse_args()
     os.makedirs(args.output_dir, exist_ok=True)
-    main(args.sam_dir, args.raw_dir, args.output_dir)
-
+    main(args.sam_dir, args.raw_dir, args.output_dir, args.min_seg_size)

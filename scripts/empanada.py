@@ -25,7 +25,7 @@ def run_empanada_inference(tile, config_path, temp_tile_path, tile_idx, args):
     io.imsave(temp_tile_path, tile)
 
     # Build the command with optional arguments
-    command = f"python /hpc/mydata/james.dimartino/Emp2mSAM/empanada/scripts/pdl2_inference3d.py {config_path} {temp_tile_path}"
+    command = f"python empanada_inference.py {config_path} {temp_tile_path}"
     if args.data_key:
         command += f" -data-key {args.data_key}"
     if args.mode:

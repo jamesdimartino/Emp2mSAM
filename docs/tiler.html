@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TIFF Stack Processing Script Documentation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2, h3, h4, h5, h6 {
+            margin-top: 20px;
+        }
+        pre {
+            background: #333;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            overflow: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>TIFF Stack Processing Script Documentation</h1>
+
+        <hr>
+
+        <h2>Overview</h2>
+        <p>This script processes a TIFF stack by loading it in chunks, tiling the chunks, and saving the resulting tiles to an output directory. It is designed to handle large TIFF stacks efficiently by processing them in blocks and chunks, utilizing GPU resources if available, and managing memory usage throughout the process.</p>
+
+        <hr>
+
+        <h2>Functions</h2>
+
+        <h3><code>load_tiff_stack(file_path, start_slice, end_slice)</code></h3>
+        <p>Load a chunk of a TIFF stack.</p>
+        <h4>Parameters:</h4>
+        <ul>
+            <li><code>file_path (str)</code>: Path to the TIFF file.</li>
+            <li><code>start_slice (int)</code>: Starting slice index.</li>
+            <li><code>end_slice (int)</code>: Ending slice index.</li>
+        </ul>
+        <h4>Returns:</h4>
+        <ul>
+            <li><code>numpy.ndarray</code>: Loaded chunk of the TIFF stack.</li>
+        </ul>
+
+        <h3><code>tile_chunk(chunk, tile_shape)</code></h3>
+        <p>Tile a chunk of the TIFF stack into smaller tiles.</p>
+        <h4>Parameters:</h4>
+        <ul>
+            <li><code>chunk (numpy.ndarray)</code>: Chunk of the TIFF stack.</li>
+            <li><code>tile_shape (tuple)</code>: Shape of the tiles (depth, height, width).</li>
+        </ul>
+        <h4>Returns:</h4>
+        <ul>
+            <li><code>numpy.ndarray</code>: Array of tiled chunks.</li>
+        </ul>
+
+        <h3><code>save_tile(tile, index, directory)</code></h3>
+        <p>Save a tile to a file.</p>
+        <h4>Parameters:</h4>
+        <ul>
+            <li><code>tile (numpy.ndarray)</code>: Tile to save.</li>
+            <li><code>index (int)</code>: Index of the tile.</li>
+            <li><code>directory (str)</code>: Directory to save the tile.</li>
+        </ul>
+
+        <h3><code>print_memory_usage(stage)</code></h3>
+        <p>Print the current memory usage.</p>
+        <h4>Parameters:</h4>
+        <ul>
+            <li><code>stage (str)</code>: Stage of the processing.</li>
+        </ul>
+
+        <h3><code>main(tiff_path, output_dir, block_size, chunk_size, tile_shape)</code></h3>
+        <p>Main function to process the TIFF stack.</p>
+        <h4>Parameters:</h4>
+        <ul>
+            <li><code>tiff_path (str)</code>: Path to the TIFF file.</li>
+            <li><code>output_dir (str)</code>: Directory to save the tiles.</li>
+            <li><code>block_size (int)</code>: Number of slices per block.</li>
+            <li><code>chunk_size (int)</code>: Number of slices per chunk.</li>
+            <li><code>tile_shape (tuple)</code>: Shape of the tiles (height, width).</li>
+        </ul>
+
+        <h3><code>parse_args()</code></h3>
+        <p>Parse command line arguments.</p>
+        <h4>Returns:</h4>
+        <ul>
+            <li><code>argparse.Namespace</code>: Parsed command line arguments.</li>
+        </ul>
+
+    </div>
+</body>
+</html>

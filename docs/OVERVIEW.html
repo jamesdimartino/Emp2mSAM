@@ -79,7 +79,8 @@ mamba install -c pytorch -c conda-forge micro_sam
             <li><code>main(tiff_path, output_dir, block_size, chunk_size, tile_shape)</code>: Main function to process the TIFF stack.</li>
         </ul>
         <h3>Usage</h3>
-        <pre><code>python tiler.py &lt;tiff_path&gt; &lt;output_dir&gt; --block_size &lt;block_size&gt; --chunk_size &lt;chunk_size&gt; --tile_shape &lt;height&gt; &lt;width&gt;</code></pre>
+        <pre><code>python tiler.py &lt;tiff_path&gt; &lt;output_dir&gt; --block_size &lt;block_size&gt; --chunk_size &lt;chunk_size&gt; 
+            --tile_shape &lt;height&gt; &lt;width&gt;</code></pre>
 
         <hr>
 
@@ -112,7 +113,8 @@ mamba install -c pytorch -c conda-forge micro_sam
             <li><code>parse_args()</code>: Parses command line arguments.</li>
         </ul>
         <h3>Usage</h3>
-        <pre><code>python samboxes.py &lt;input_dir&gt; &lt;empanada_dir&gt; &lt;output_dir&gt; --enlargement_factor &lt;factor&gt; --tile_shape &lt;height&gt; &lt;width&gt;</code></pre>
+        <pre><code>python samboxes.py &lt;input_dir&gt; &lt;empanada_dir&gt; &lt;output_dir&gt; --enlargement_factor &lt;factor&gt; 
+            --tile_shape &lt;height&gt; &lt;width&gt;</code></pre>
 
         <hr>
 
@@ -158,7 +160,8 @@ mamba install -c pytorch -c conda-forge micro_sam
             <li><code>parse_args()</code>: Parses command line arguments.</li>
         </ul>
         <h3>Usage</h3>
-        <pre><code>python stitch_save.py &lt;input_dir&gt; &lt;output_tiff_path&gt; --original_shape &lt;depth&gt; &lt;height&gt; &lt;width&gt; --tile_shape &lt;depth&gt; &lt;height&gt; &lt;width&gt;</code></pre>
+        <pre><code>python stitch_save.py &lt;input_dir&gt; &lt;output_tiff_path&gt; --original_shape &lt;depth&gt; &lt;height&gt; &lt;width&gt; 
+            --tile_shape &lt;depth&gt; &lt;height&gt; &lt;width&gt;</code></pre>
 
         <hr>
 
@@ -176,7 +179,8 @@ mamba install -c pytorch -c conda-forge micro_sam
             <li><code>main()</code>: Main function to run the entire EM data processing pipeline.</li>
         </ul>
         <h3>Usage</h3>
-        <pre><code>python pipeline.py &lt;input_tiff&gt; &lt;output_dir&gt; --block_size &lt;block_size&gt; --chunk_size &lt;chunk_size&gt; --tile_shape &lt;height&gt; &lt;width&gt; --original_shape &lt;depth&gt; &lt;height&gt; &lt;width&gt;</code></pre>
+        <pre><code>python pipeline.py &lt;input_tiff&gt; &lt;output_dir&gt; --block_size &lt;block_size&gt; --chunk_size &lt;chunk_size&gt; 
+            --tile_shape &lt;height&gt; &lt;width&gt; --original_shape &lt;depth&gt; &lt;height&gt; &lt;width&gt;</code></pre>
     </div>
 </body>
 </html>

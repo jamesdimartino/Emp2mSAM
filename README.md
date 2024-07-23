@@ -201,7 +201,7 @@ python sampoints.py <sam_dir> <raw_dir> <output_dir>
 
 ---
 
-## Tile Merging Script Documentation (mergealltiles.py)
+## mergealltiles.py
 
 This script merges tiles using a multicut segmentation approach.
 
@@ -225,7 +225,7 @@ python mergealltiles.py <tile_path> <output_dir>
 
 ---
 
-## Tile Stitching Script Documentation (stitch_save.py)
+## stitch_save.py
 
 This script stitches tiles from a directory into a single array and saves it as a TIFF file.
 

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Empanada Inference Script Documentation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2, h3, h4, h5, h6 {
+            margin-top: 20px;
+        }
+        pre {
+            background: #333;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Comprehensive Documentation for Empanada Inference Script</h1>
+        
+        <hr>
+
+        <h2>Overview</h2>
+        <p>This script is designed to run empanada inference on a series of tiles, perform segmentation, and save the results. The process involves loading input tiles, running the empanada model on each tile, and saving the segmented results. Memory usage is logged at different stages to ensure efficient processing. The script is flexible, with several configurable parameters to customize the inference process.</p>
+
+        <hr>
+
+        <h2>Function: <code>run_empanada_inference(tile, config_path, temp_tile_path, tile_idx, args)</code></h2>
+        
+        <h3>Description:</h3>
+        <p>This function runs the empanada inference on a given tile and saves the resulting segmentation. It first saves the tile as a temporary TIFF file, constructs a command to run the empanada script with various optional arguments, executes the command, and finally loads the resulting segmented image.</p>
+
+        <h3>Parameters:</h3>
+        <ul>
+            <li><code>tile (numpy.ndarray)</code>: The input tile data to be processed.</li>
+            <li><code>config_path (str)</code>: The path to the empanada configuration file which contains the model and inference settings.</li>
+            <li><code>temp_tile_path (str)</code>: The path to save the temporary tile file in TIFF format, used for intermediate processing.</li>
+            <li><code>tile_idx (int)</code>: The index of the current tile being processed, used for logging and identifying tiles.</li>
+            <li><code>args (argparse.Namespace)</code>: Parsed command line arguments that provide additional configuration options for the inference.</li>
+        </ul>
+
+        <h3>Returns:</h3>
+        <ul>
+            <li><code>numpy.ndarray</code>: The result of the empanada inference, a segmented image.</li>
+        </ul>
+
+        <h3>Detailed Steps:</h3>
+        <ol>
+            <li>Save the tile as a temporary TIFF file.</li>
+            <li>Build the command to run the empanada inference script with optional arguments based on user input.</li>
+            <li>Execute the command.</li>
+            <li>Load the result from the generated file.</li>
+            <li>Clean up by deleting the temporary files.</li>
+        </ol>
+
+        <hr>
+
+        <h2>Function: <code>log_memory_usage(stage)</code></h2>
+        
+        <h3>Description:</h3>
+        <p>Logs the current memory usage of the process to monitor and ensure efficient memory management during different stages of processing.</p>
+
+        <h3>Parameters:</h3>
+        <ul>
+            <li><code>stage (str)</code>: A string indicating the current stage of processing (e.g., "Before inference", "After inference").</li>
+        </ul>
+
+        <h3>Detailed Steps:</h3>
+        <ol>
+            <li>Retrieve the memory usage of the current process using <code>psutil</code>.</li>
+            <li>Print the memory usage in megabytes (MB).</li>
+        </ol>
+
+        <hr>
+
+        <h2>Function: <code>process_tiles(input_dir, config_path, output_dir, args)</code></h2>
+        
+        <h3>Description:</h3>
+        <p>Processes all tiles in the input directory by running empanada inference on each tile and saving the results to the output directory. It handles the loading of tiles, calling the inference function, logging memory usage, and saving results.</p>
+
+        <h3>Parameters:</h3>
+        <ul>
+            <li><code>input_dir (str)</code>: Directory containing the input tiles in <code>.npy</code> format.</li>
+            <li><code>config_path (str)</code>: Path to the empanada configuration file.</li>
+            <li><code>output_dir (str)</code>: Directory to save the segmented results.</li>
+            <li><code>args (argparse.Namespace)</code>: Parsed command line arguments providing additional options for inference.</li>
+        </ul>
+
+        <h3>Detailed Steps:</h3>
+        <ol>
+            <li>List all <code>.npy</code> files in the input directory.</li>
+            <li>For each tile:
+                <ol>
+                    <li>Load the tile data.</li>
+                    <li>Run the empanada inference.</li>
+                    <li>Log memory usage before and after inference.</li>
+                    <li>Save the resulting segmentation to the output directory.</li>
+                </ol>
+            </li>
+        </ol>
+
+        <hr>
+
+        <h2>Function: <code>parse_args()</code></h2>
+        
+        <h3>Description:</h3>
+        <p>Parses command line arguments to provide flexible configuration for running the script. It includes options for various inference parameters and settings.</p>
+
+        <h3>Returns:</h3>
+        <ul>
+            <li><code>argparse.Namespace</code>: Parsed command line arguments encapsulated in a namespace.</li>
+        </ul>
+
+        <h3>Command Line Arguments:</h3>
+        <ul>
+            <li><code>input_dir (str)</code>: Directory containing input tiles.</li>
+            <li><code>output_dir (str)</code>: Directory to save empanada results.</li>
+            <li>Optional arguments for configuring inference behavior, such as:
+                <ul>
+                    <li><code>data-key</code>: Key in zarr volume if applicable.</li>
+                    <li><code>mode</code>: Inference mode (<code>orthoplane</code> or <code>stack</code>).</li>
+                    <li><code>qlen</code>: Length of the median filtering queue.</li>
+                    <li><code>label_divisor</code>: Maximum number of objects per instance class.</li>
+                    <li><code>seg_thr</code>, <code>nms_thr</code>, <code>iou_thr</code>, <code>ioa_thr</code>: Various thresholds for segmentation and merging.</li>
+                    <li><code>nms_kernel</code>: Minimum distance between object centers.</li>
+                    <li><code>pixel_vote_thr</code>: Votes necessary per voxel.</li>
+                    <li><code>cluster_iou_thr</code>: IoU threshold for grouping instances.</li>
+                    <li><code>min_size</code>, <code>min_span</code>: Minimum size and span for objects.</li>
+                    <li><code>downsample_f</code>: Downsampling factor for images.</li>
+                    <li><code>one_view</code>, <code>fine_boundaries</code>, <code>use_cpu</code>, <code>save_panoptic</code>: Boolean flags for additional configurations.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <hr>
+
+        <h2>Function: <code>main()</code></h2>
+        
+        <h3>Description:</h3>
+        <p>The main function orchestrates the overall process by parsing command line arguments, setting up directories, and calling the <code>process_tiles</code> function to run empanada inference on all tiles.</p>
+
+        <h3>Detailed Steps:</h3>
+        <ol>
+            <li>Parse command line arguments.</li>
+            <li>Create the output directory if it doesn't exist.</li>
+            <li>Call <code>process_tiles</code> with the input directory, config path, output directory, and parsed arguments.</li>
+        </ol>
+
+        <hr>
+
+        <h2>Example Usage</h2>
+        <p>To run the script, use the following command:</p>
+        <pre><code>python your_script.py /path/to/input_dir /path/to/output_dir</code></pre>
+        <p>You can include optional arguments to customize the inference process, for example:</p>
+        <pre><code>python your_script.py /path/to/input_dir /path/to/output_dir -mode orthoplane -qlen 5 --use-cpu</code></pre>
+
+    </div>
+</body>
+</html>

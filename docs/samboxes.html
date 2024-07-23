@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAM Inference Script Documentation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2, h3, h4, h5, h6 {
+            margin-top: 20px;
+        }
+        pre {
+            background: #333;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            overflow: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SAM Inference Script Documentation</h1>
+
+        <hr>
+
+        <h2>Overview</h2>
+        <p>This script performs SAM (Segment Anything Model) inference on tiles of image data using bounding boxes extracted from empanada results. The script involves loading tile data, extracting bounding boxes, running SAM inference, and saving the results. The script supports GPU acceleration if available.</p>
+
+        <hr>
+
+        <h2>Functions</h2>
+
+        <h3><code>print_memory_usage()</code></h3>
+        <p>Print the current memory usage.</p>
+
+        <h3><code>load_tile(tile_path)</code></h3>
+        <p>Load a tile from a file.</p>
+        <h4>Parameters:</h4>
+        <ul>
+            <li><code>tile_path (str)</code>: Path to the tile file.</li>
+        </ul>
+        <h4>Returns:</h4>
+        <ul>
+            <li><code>numpy.ndarray</code>: Loaded tile data.</li>
+        </ul>
+
+        <h3><code>extract_bounding_boxes(empanada_results, enlargement_factor)</code></h3>
+        <p>Extract bounding boxes from empanada results.</p>
+        <h4>Parameters:</h4>
+        <ul>
+            <li><code>empanada_results (list of numpy.ndarray)</code>: Empanada result tiles.</li>
+            <li><code>enlargement_factor (float)</code>: Factor to enlarge bounding boxes.</li>
+        </ul>
+        <h4>Returns:</h4>
+        <ul>
+            <li><code>list</code>: Extracted bounding boxes for each slice.</li>
+        </ul>
+
+        <h3><code>run_sam_inference(predictor, image, boxes, batch_size=1)</code></h3>
+        <p>Run SAM inference on an image with given bounding boxes.</p>
+        <h4>Parameters:</h4>
+        <ul>
+            <li><code>predictor (SamPredictor)</code>: SAM model predictor.</li>
+            <li><code>image (numpy.ndarray)</code>: Image data.</li>
+            <li><code>boxes (list)</code>: Bounding boxes for the image.</li>
+            <li><code>batch_size (int)</code>: Batch size for inference.</li>
+        </ul>
+        <h4>Returns:</h4>
+        <ul>
+            <li><code>numpy.ndarray</code>: SAM segmentation mask.</li>
+        </ul>
+
+        <h3><code>process_and_save_tile(predictor, raw_tile, boxes, tile_idx, output_dir)</code></h3>
+        <p>Process and save a tile with SAM inference.</p>
+        <h4>Parameters:</h4>
+        <ul>
+            <li><code>predictor (SamPredictor)</code>: SAM model predictor.</li>
+            <li><code>raw_tile (numpy.ndarray)</code>: Raw tile data.</li>
+            <li><code>boxes (list)</code>: Bounding boxes for the tile.</li>
+            <li><code>tile_idx (int)</code>: Index of the tile.</li>
+            <li><code>output_dir (str)</code>: Directory to save the SAM results.</li>
+        </ul>
+
+        <h3><code>load_empanada_results(empanada_dir)</code></h3>
+        <p>Load empanada results from a directory.</p>
+        <h4>Parameters:</h4>
+        <ul>
+            <li><code>empanada_dir (str)</code>: Directory containing empanada result files.</li>
+        </ul>
+        <h4>Returns:</h4>
+        <ul>
+            <li><code>list</code>: Loaded empanada result tiles.</li>
+        </ul>
+
+        <h3><code>main(input_dir, empanada_dir, output_dir, enlargement_factor, tile_shape)</code></h3>
+        <p>Main function to run SAM inference on all tiles.</p>
+        <h4>Parameters:</h4>
+        <ul>
+            <li><code>input_dir (str)</code>: Directory containing input tiles.</li>
+            <li><code>empanada_dir (str)</code>: Directory containing empanada result files.</li>
+            <li><code>output_dir (str)</code>: Directory to save SAM results.</li>
+            <li><code>enlargement_factor (float)</code>: Factor to enlarge bounding boxes.</li>
+            <li><code>tile_shape (tuple)</code>: Shape of the tiles (height, width, depth).</li>
+        </ul>
+
+        <h3><code>parse_args()</code></h3>
+        <p>Parse command line arguments.</p>
+        <h4>Returns:</h4>
+        <ul>
+            <li><code>argparse.Namespace</code>: Parsed command line arguments.</li>
+        </ul>
+
+    </div>
+</body>
+</html>

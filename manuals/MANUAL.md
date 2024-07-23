@@ -1,14 +1,18 @@
-# EM Data Processing Pipeline Documentation
-
----
-
-## Emp2mSAM Overview Documentation
+# Emp2mSAM Pipeline User Guide
 
 ---
 
 ## Background Information
 
-This pipeline processes electron microscopy (EM) data by following a series of steps that include tiling the data, running inference with the Empanada model, performing SAM inference, extracting points, merging tiles, and finally stitching the results into a single TIFF file. This end-to-end pipeline ensures efficient processing of large EM datasets while maintaining the integrity and quality of the data.
+This pipeline processes electron microscopy (EM) data to obtain mitochondrial segmentations by following a series of steps:
+1. If larger than (:, 1024, 1024), the data is tiled into smaller chunks to be processed.
+2. Initial segmentations for the tiled data are obtained with the Empanada model.
+3. The empanada segmentations are converted to box prompts, which are used by the microSAM model to generate secondary segmentations.
+4. The segmentations obtained from the microSAM model are filtered for small segmentations. Centroids are obtained for segmentations below the threshold, which are used as point prompts for the microSAM model to generate tertiary segmentations. These are combined with the secondary segmentations into a final segmentation set.
+5. The final segmentations are merged in 3D space to obtain 3D instance segmentations of the mitochondria
+6. The tiled results are stitched into a single tiff stack the size of the original image volume.
+
+This end-to-end pipeline ensures efficient processing of large EM datasets while maintaining the integrity and quality of the data.
 
 The pipeline is designed to handle large datasets by breaking them into manageable tiles and chunks, performing processing on each piece, and then reassembling the processed data. The use of GPU resources where available, along with memory management techniques, ensures that the pipeline can handle large volumes of data efficiently.
 
@@ -16,7 +20,7 @@ The pipeline is designed to handle large datasets by breaking them into manageab
 
 ## Prerequisites
 
-Ensure you have the following prerequisites installed in a clean environment:
+Install the following prerequisites in the following order in a clean environment:
 
 ```bash
 # Install CUDA 12.1

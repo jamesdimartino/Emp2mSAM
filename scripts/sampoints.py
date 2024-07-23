@@ -193,7 +193,7 @@ def parse_args():
     parser.add_argument('sam_dir', type=str, help='Directory containing SAM1 results')
     parser.add_argument('raw_dir', type=str, help='Directory containing raw tile images')
     parser.add_argument('output_dir', type=str, help='Directory to save SAM2 results')
-    parser.add_argument('min_seg_size', type=int, help='Minimum pixel area for a mask to be re-run with a point prompt')
+    parser.add_argument('--min_seg_size', type=int, help='Minimum pixel area for a mask to be re-run with a point prompt')
     return parser.parse_args()
 
 if __name__ == "__main__":

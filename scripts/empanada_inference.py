@@ -11,11 +11,11 @@ import torch.multiprocessing as mp
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from empanada.data import VolumeDataset
-from empanada.inference.engines import PanopticDeepLabRenderEngine3d
-from empanada.inference import filters
-from empanada.config_loaders import load_config
-from empanada.inference.patterns import *
+from empanada-dl.empanada.data import VolumeDataset
+from empanada-dl.empanada.inference.engines import PanopticDeepLabRenderEngine3d
+from empanada-dl.empanada.inference import filters
+from empanada-dl.empanada.config_loaders import load_config
+from empanada-dl.empanada.inference.patterns import *
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Runs empanada model inference.')
@@ -251,7 +251,7 @@ if __name__ == "__main__":
                 fill_volume(consensus_vol, consensus_tracker.instances)
 
                 volpath = os.path.dirname(args.volume_path)
-                volname = os.path.basename(args.volume_path).replace('.tif', f'_{class_name}.tif')
+                volname = os.path.basename(args.volume_path)
                 io.imsave(os.path.join(volpath, volname), consensus_vol)
 
         print('Finished!')

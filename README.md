@@ -12,7 +12,7 @@ This pipeline processes electron microscopy (EM) data to obtain mitochondrial se
 5. The final segmentations are merged in 3D space to obtain 3D instance segmentations of the mitochondria
 6. The tiled results are stitched into a single tiff stack the size of the original image volume.
 
-This end-to-end pipeline ensures efficient processing of large EM datasets while maintaining the integrity and quality of the data.
+The pipeline can be run end-to-end, with the only inputs given being the input pathway to a TIFF volume, the desired output location, the shape of the volume, the desired shape of tiles for processing, and the block and chunk sizes. It can also be run in individual poritions by calling the scripts below one at a time.
 
 The pipeline is designed to handle large datasets by breaking them into manageable tiles and chunks, performing processing on each piece, and then reassembling the processed data. The use of GPU resources where available, along with memory management techniques, ensures that the pipeline can handle large volumes of data efficiently.
 
@@ -56,17 +56,26 @@ This script runs the entire EM data processing pipeline end-to-end.
 - `run_stitch(input_dir, output_tiff_path, original_shape, tile_shape)`: Runs the tile stitching script.
 - `main()`: Main function to run the entire EM data processing pipeline.
 
+### Arguments
+
+- `tiff_path`: File path to raw tiff volume.
+- `output_dir`: File path for results.
+- `chunk_size`: Number of z slices from the original volume to process at a time. May require some trial and error to balance speed with memory consumption, default is 100.
+- `block_size`: Number of z slices per chunk to process at a time. May require some trial and error to balance speed with memory consumption, default is 500.
+- `original_shape`: Original shape of the input volume.
+- `tile_shape`: Desired shape of tiles for data processing. Ideally, this should be 1024x1024, as this is the best input image shape for SAM.
+
 ### Usage
 
 ```bash
-python pipeline.py <input_tiff> <output_dir> --block_size <block_size> --chunk_size <chunk_size> --tile_shape <height> <width> --original_shape <depth> <height> <width>
+python pipeline.py <tiff_path> <output_dir> --block_size <block_size> --chunk_size <chunk_size> --tile_shape <height> <width> --original_shape <depth> <height> <width>
 ```
 
 ---
 
 ## Tiler Script Documentation (tiler.py)
 
-This script processes a TIFF stack into smaller tiles for further analysis.
+This script processes a TIFF stack into smaller tiles. The TIFF stack is loaded in chunks of z planes, which are then tiled into blocks. These blocks are then stacked to create tiles that span the full z length of the stack. For example, starting with an original image with dimensions (500, 4096, 4096), tile_shape of (1024, 1024), chunk_size of 100, and block_size of 500, the data would first be divided into 5 (100, 4096, 4096) chunks, which would then be further divided into 80 (100, 1024, 1024) blocks, before being stacked into 16 (500, 1024, 1024) tiles, the shape used for further processing.
 
 ### Functions
 

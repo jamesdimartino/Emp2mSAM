@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAM Inference Pipeline Script Documentation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2, h3, h4, h5, h6 {
+            margin-top: 20px;
+        }
+        pre {
+            background: #333;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            overflow: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SAM Inference Pipeline Script Documentation</h1>
+
+        <hr>
+
+        <h2>Overview</h2>
+        <p>This script performs SAM (Segment Anything Model) inference on tiles of image data using bounding boxes extracted from SAM results. The script involves loading tile data, extracting centroids and points, running SAM inference, and saving the results. The script supports GPU acceleration if available.</p>
+
+        <hr>
+
+        <h2>Functions</h2>
+
+        <h3><code>print_memory_usage()</code></h3>
+        <p>Logs the current memory usage of the process.</p>
+
+        <h3><code>load_tile(tile_path)</code></h3>
+        <p>Loads a tile from a specified path.</p>
+        <h4>Parameters:</h4>
+        <ul>
+            <li><code>tile_path (str)</code>: Path to the tile file.</li>
+        </ul>
+        <h4>Returns:</h4>
+        <ul>
+            <li><code>np.ndarray</code>: Loaded tile.</li>
+        </ul>
+
+        <h3><code>load_sam_results(sam_dir)</code></h3>
+        <p>Loads SAM results from a specified directory.</p>
+        <h4>Parameters:</h4>
+        <ul>
+            <li><code>sam_dir (str)</code>: Directory containing SAM result files.</li>
+        </ul>
+        <h4>Returns:</h4>
+        <ul>
+            <li><code>list of np.ndarray</code>: List of loaded SAM result files.</li>
+        </ul>
+
+        <h3><code>extract_centroids_and_points(sam_results, min_area=2000)</code></h3>
+        <p>Extracts centroids and points from SAM results for small masks and removes small masks.</p>
+        <h4>Parameters:</h4>
+        <ul>
+            <li><code>sam_results (list of np.ndarray)</code>: List of SAM result files.</li>
+            <li><code>min_area (int)</code>: Minimum area threshold for masks to be retained.</li>
+        </ul>
+        <h4>Returns:</h4>
+        <ul>
+            <li><code>tuple</code>:
+                <ul>
+                    <li><code>all_points (list)</code>: List of points for small masks.</li>
+                    <li><code>all_point_labels (list)</code>: List of point labels for small masks.</li>
+                    <li><code>cleaned_sam_results (list of np.ndarray)</code>: List of cleaned SAM results with small masks removed.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h3><code>run_sam_inference(predictor, image, points, point_labels, batch_size=1)</code></h3>
+        <p>Runs SAM inference on an image using specified points and point labels.</p>
+        <h4>Parameters:</h4>
+        <ul>
+            <li><code>predictor (SamPredictor)</code>: The SAM predictor object.</li>
+            <li><code>image (np.ndarray)</code>: The input image.</li>
+            <li><code>points (np.ndarray)</code>: The point prompts.</li>
+            <li><code>point_labels (np.ndarray)</code>: The point labels.</li>
+            <li><code>batch_size (int)</code>: The batch size for inference.</li>
+        </ul>
+        <h4>Returns:</h4>
+        <ul>
+            <li><code>np.ndarray</code>: The segmentation mask.</li>
+        </ul>
+
+        <h3><code>process_and_save_tile(predictor, raw_tile, points, point_labels, cleaned_sam_results, tile_idx, output_dir)</code></h3>
+        <p>Processes and saves a tile after running SAM inference and combining results.</p>
+        <h4>Parameters:</h4>
+        <ul>
+            <li><code>predictor (SamPredictor)</code>: The SAM predictor object.</li>
+            <li><code>raw_tile (np.ndarray)</code>: The raw tile image.</li>
+            <li><code>points (list)</code>: List of points for SAM inference.</li>
+            <li><code>point_labels (list)</code>: List of point labels for SAM inference.</li>
+            <li><code>cleaned_sam_results (list of np.ndarray)</code>: List of cleaned SAM results.</li>
+            <li><code>tile_idx (int)</code>: Index of the current tile.</li>
+            <li><code>output_dir (str)</code>: Directory to save the output results.</li>
+        </ul>
+
+        <h3><code>main(sam_dir, raw_dir, output_dir)</code></h3>
+        <p>Main function to run the SAM inference pipeline.</p>
+        <h4>Parameters:</h4>
+        <ul>
+            <li><code>sam_dir (str)</code>: Directory containing SAM1 results.</li>
+            <li><code>raw_dir (str)</code>: Directory containing raw tile images.</li>
+            <li><code>output_dir (str)</code>: Directory to save SAM2 results.</li>
+        </ul>
+
+        <h3><code>parse_args()</code></h3>
+        <p>Parse command line arguments.</p>
+        <h4>Returns:</h4>
+        <ul>
+            <li><code>argparse.Namespace</code>: Parsed command line arguments.</li>
+        </ul>
+
+    </div>
+</body>
+</html>

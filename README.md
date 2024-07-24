@@ -27,7 +27,7 @@ Install the following prerequisites in the following order in a clean environmen
 conda install cuda=12.1
 
 # Install cuDNN
-pip install cudnn
+conda install cudnn
 
 # Install PyTorch with CUDA support
 conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia

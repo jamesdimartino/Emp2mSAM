@@ -24,7 +24,7 @@ Install the following prerequisites in the following order in a clean environmen
 
 ```bash
 # Install CUDA 12.1
-pip install cuda=12.1
+conda install cuda=12.1
 
 # Install cuDNN
 pip install cudnn

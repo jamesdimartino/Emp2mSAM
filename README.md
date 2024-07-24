@@ -35,6 +35,9 @@ conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvi
 # Install Empanada
 conda install empanada-dl
 
+#Install cupy for the merge function
+conda install cupy
+
 # Install Micro-SAM
 mamba install -c pytorch -c conda-forge micro_sam
 ```

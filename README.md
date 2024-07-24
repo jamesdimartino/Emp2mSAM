@@ -20,7 +20,7 @@ The pipeline is designed to handle large datasets by breaking them into manageab
 
 ## Prerequisites
 
-Install the following prerequisites in the following order in a clean environment:
+Install the following prerequisites in the following order in a clean environment USING PYTHON 3.9:
 
 ```bash
 # Install CUDA 12.1

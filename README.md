@@ -38,7 +38,7 @@ conda install empanada-dl
 # Install Micro-SAM
 mamba install -c pytorch -c conda-forge micro_sam
 
-pip install U-Segment3D
+pip install u-Segment3D
 ```
 
 Then, navigate to the directory you wish to operate from and run:

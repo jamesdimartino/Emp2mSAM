@@ -1,4 +1,4 @@
-import os
+gimport os
 import argparse
 
 def parse_args():
@@ -31,7 +31,7 @@ def run_points(sam_dir, raw_dir, output_dir):
     os.system(f"python sampoints.py {sam_dir} {raw_dir} {output_dir}")
 
 def run_merge(input_dir, output_dir):
-    os.system(f"python mergealltiles.py {input_dir} {output_dir}")
+    os.system(f"python merge_instances.py {input_dir} {output_dir}")
 
 def run_stitch(input_dir, output_tiff_path, original_shape, tile_shape):
     os.system(f"python stitch_save.py {input_dir} {output_tiff_path} --original_shape {original_shape[0]} {original_shape[1]} {original_shape[2]} --tile_shape {tile_shape[0]} {tile_shape[1]} {tile_shape[2]}")

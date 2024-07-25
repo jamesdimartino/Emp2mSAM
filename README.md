@@ -38,14 +38,11 @@ conda install empanada-dl
 # Install Micro-SAM
 mamba install -c pytorch -c conda-forge micro_sam
 
-# Navigate to the u-Segment3D directory and run 
-pip install .
-
-# Uninstall cupy-cuda11x
-pip uninstall cupy-cuda11x
-
-#Install cupy-cuda12x
+# Install cupy-cuda12x
 pip install cupy-cuda12x
+
+# Install distinctipy
+pip install distinctipy
 ```
 
 Then, navigate to the directory you wish to operate from and run:

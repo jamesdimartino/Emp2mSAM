@@ -85,7 +85,7 @@ This script runs the entire EM data processing pipeline end-to-end.
 ### Usage
 
 ```bash
-python pipeline.py <tiff_path> <output_dir> --block_size <block_size> --chunk_size <chunk_size> --tile_shape <height> <width> --original_shape <depth> <height> <width>
+python run_end2end.py <tiff_path> <output_dir> --block_size <block_size> --chunk_size <chunk_size> --tile_shape <height> <width> --original_shape <depth> <height> <width>
 ```
 
 ---

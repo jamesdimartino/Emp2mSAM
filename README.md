@@ -233,7 +233,7 @@ python mergealltiles.py <tile_path> <output_dir>
 
 ## stitch_save.py
 
-This script stitches tiles from a directory into a single array and saves it as a TIFF file.
+This script stitches tiles from a directory into a single array and saves it as a TIFF file. Additionally, it merges across stitch lines to create continuous images in 3D space.
 
 ### Functions
 

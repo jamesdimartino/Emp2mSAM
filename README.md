@@ -32,17 +32,14 @@ conda install cudnn
 # Install PyTorch with CUDA support
 conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
 
-# Install Empanada
-conda install empanada-dl
-
 # Install Micro-SAM
 mamba install -c pytorch -c conda-forge micro_sam
 
-# Install cupy-cuda12x
-pip install cupy-cuda12x
+# Install cupy-cuda12x and distinctipy
+pip install cupy-cuda12x distinctipy
 
-# Install distinctipy
-pip install distinctipy
+# Install empanada
+pip install empanada-dl
 ```
 
 Then, navigate to the directory you wish to operate from and run:

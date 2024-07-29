@@ -138,16 +138,16 @@ def parse_args():
     parser.add_argument('-data-key', type=str, metavar='data-key', default=None,
                         help='Key in zarr volume (if volume_path is a zarr). For multiple keys, separate with a comma.')
     parser.add_argument('-mode', type=str, dest='mode', metavar='inference_mode', choices=['orthoplane', 'stack'],
-                        default=None, help='Pick orthoplane (xy, xz, yz) or stack (xy)')
+                        default='stack', help='Pick orthoplane (xy, xz, yz) or stack (xy)')
     parser.add_argument('-qlen', type=int, dest='qlen', metavar='qlen', choices=[1, 3, 5, 7, 9, 11],
                         default=None, help='Length of median filtering queue, an odd integer')
     parser.add_argument('-nmax', type=int, dest='label_divisor', metavar='label_divisor',
                         default=None, help='Maximum number of objects per instance class allowed in volume.')
-    parser.add_argument('-seg-thr', type=float, dest='seg_thr', metavar='seg_thr', default=None,
+    parser.add_argument('-seg-thr', type=float, dest='seg_thr', metavar='seg_thr', default=0.08,
                         help='Segmentation confidence threshold (0-1)')
-    parser.add_argument('-nms-thr', type=float, dest='nms_thr', metavar='nms_thr', default=None,
+    parser.add_argument('-nms-thr', type=float, dest='nms_thr', metavar='nms_thr', default=1.0,
                         help='Centroid confidence threshold (0-1)')
-    parser.add_argument('-nms-kernel', type=int, dest='nms_kernel', metavar='nms_kernel', default=None,
+    parser.add_argument('-nms-kernel', type=int, dest='nms_kernel', metavar='nms_kernel', default=100,
                         help='Minimum allowed distance, in pixels, between object centers')
     parser.add_argument('-iou-thr', type=float, dest='iou_thr', metavar='iou_thr', default=None,
                         help='Minimum IoU score between objects in adjacent slices for label stiching')
@@ -157,11 +157,11 @@ def parse_args():
                         choices=[1, 2, 3], help='Votes necessary per voxel when using orthoplane inference')
     parser.add_argument('-cluster-iou-thr', type=float, dest='cluster_iou_thr', metavar='cluster_iou_thr', default=None,
                         help='Minimum IoU to group together instances after orthoplane inference')
-    parser.add_argument('-min-size', type=int, dest='min_size', metavar='min_size', default=None,
+    parser.add_argument('-min-size', type=int, dest='min_size', metavar='min_size', default=5,
                         help='Minimum object size, in voxels, in the final 3d segmentation')
-    parser.add_argument('-min-span', type=int, dest='min_span', metavar='min_span', default=None,
+    parser.add_argument('-min-span', type=int, dest='min_span', metavar='min_span', default=4,
                         help='Minimum number of consecutive slices that object must appear on in final 3d segmentation')
-    parser.add_argument('-downsample-f', type=int, dest='downsample_f', metavar='dowsample_f', default=None,
+    parser.add_argument('-downsample-f', type=int, dest='downsample_f', metavar='dowsample_f', default=1,
                         help='Factor by which to downsample images before inference, must be log base 2.')
     parser.add_argument('--one-view', action='store_true', help='One to allow instances seen in just 1 stack through to orthoplane consensus.')
     parser.add_argument('--fine-boundaries', action='store_true', help='Whether to calculate cells on full resolution image.')

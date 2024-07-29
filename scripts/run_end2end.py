@@ -22,13 +22,13 @@ def run_tiler(input_tiff, output_dir, block_size, chunk_size, tile_shape):
     os.system(f"python tiler.py {input_tiff} {output_dir}/tiles --block_size {block_size} --chunk_size {chunk_size} --tile_shape {tile_shape[0]} {tile_shape[1]}")
 
 def run_empanada(input_dir, output_dir):
-    os.system(f"python empanada.py {input_dir} {output_dir}")
+    os.system(f"python runempanada.py {input_dir} {output_dir}")
 
 def run_sam(input_dir, empanada_dir, output_dir):
-    os.system(f"python samboxes.py {input_dir} {empanada_dir} {output_dir}")
+    os.system(f"python sam_boxes.py {input_dir} {empanada_dir} {output_dir}")
 
 def run_points(sam_dir, raw_dir, output_dir):
-    os.system(f"python sampoints.py {sam_dir} {raw_dir} {output_dir}")
+    os.system(f"python sam_points.py {sam_dir} {raw_dir} {output_dir}")
 
 def run_merge(input_dir, output_dir):
     os.system(f"python merge_instances.py {input_dir} {output_dir}")

@@ -204,26 +204,21 @@ python sampoints.py <sam_dir> <raw_dir> <output_dir>
 
 ---
 
-## mergealltiles.py
+## merge_instances.py
 
-This script merges tiles using a multicut segmentation approach.
-
-### Functions
-
-- `print_memory_usage(stage)`: Logs the current memory usage.
-- `process_tile(tile_path, output_dir, gap_closing, min_z_extent, beta)`: Processes a single tile and merges segmentations.
-- `parse_args()`: Parses command line arguments.
-- `main()`: Main function to merge tiles using the mergetile.py script.
+This script merges tiles using an object tracking approach.
 
 ### Arguments
 
-- `tile_path`: File path to directory where segmentation tiles are stored. This is probably SAM points results but may be empanada results, SAM boxes results, or SAM points results depending on what you want to merge.
+- `input_idr`: File path to directory where segmentation tiles are stored. This is probably SAM points results but may be empanada results, SAM boxes results, or SAM points results depending on what you want to merge.
 - `output_dir`: File path for results directory.
+- `distance_threshold`: Distance between centroids to be considered matching.
+- `batch_size`: Number of tiles to process in a batch
 
 ### Usage
 
 ```bash
-python mergealltiles.py <tile_path> <output_dir>
+python merge_instances.py <tile_path> <output_dir> --distance_threshold=<distance_threshold> --batch_size=<batch_size>
 ```
 
 ---

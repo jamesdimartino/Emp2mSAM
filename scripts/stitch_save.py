@@ -40,6 +40,11 @@ def stitch_tiles_from_directory(input_dir, original_shape, tile_shape):
     logging.info(f"Found {len(tile_files)} tile files in the directory.")
 
     max_label = 0
+
+    # Calculate the number of tiles per dimension
+    tiles_per_row = int(np.ceil(original_shape[1] / tile_shape[1]))
+    tiles_per_col = int(np.ceil(original_shape[2] / tile_shape[2]))
+
     for tile_file in tqdm(tile_files, desc="Stitching Tiles"):
         logging.info(f"Stitching tile {tile_file}")
         tile_path = os.path.join(input_dir, tile_file)
@@ -57,10 +62,18 @@ def stitch_tiles_from_directory(input_dir, original_shape, tile_shape):
             logging.error(f"Unable to parse index from filename: {tile_file}")
             continue
 
-        row = (idx // 4) * tile_shape[1]
-        col = (idx % 4) * tile_shape[2]
-        logging.info(f"Row: {row}, Col: {col}")
-        stitched_result[:, row:row+tile_shape[1], col:col+tile_shape[2]] = temp_results
+        row_idx = idx // tiles_per_col
+        col_idx = idx % tiles_per_col
+        row_start = row_idx * tile_shape[1]
+        col_start = col_idx * tile_shape[2]
+
+        # Determine the area to place the tile (handling edge cases)
+        row_end = min(row_start + tile_shape[1], original_shape[1])
+        col_end = min(col_start + tile_shape[2], original_shape[2])
+
+        stitched_result[:, row_start:row_end, col_start:col_end] = temp_results[:,
+                                                                               :row_end - row_start,
+                                                                               :col_end - col_start]
         print_memory_usage()
 
     logging.info("Finished stitching all tiles.")

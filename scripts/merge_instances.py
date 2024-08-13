@@ -8,12 +8,13 @@ from scipy.spatial.distance import cdist
 from tqdm import tqdm
 import networkx as nx
 import gc
-import distinctipy
 
 def get_args():
     parser = argparse.ArgumentParser(description="Merge 2D instance segmentations into 3D using an object tracking-based approach.")
     parser.add_argument('input_dir', type=str, help='Directory containing input .npy files')
     parser.add_argument('output_dir', type=str, help='Directory to save output .npy files')
+    parser.add_argument('--distance_threshold', type=float, default=50, help='Distance threshold for centroid matching')
+    parser.add_argument('--batch_size', type=int, default=10, help='Number of tiles to process in a batch')
     return parser.parse_args()
 
 def load_tile(file_path):
@@ -36,7 +37,7 @@ def calculate_centroids_and_pixel_coords(labels):
     pixel_coords = [prop.coords for prop in props]
     return centroids, pixel_coords
 
-def track_instances(tile):
+def track_instances(tile, distance_threshold):
     z_slices = tile.shape[0]
     centroids_by_slice = []
     pixel_coords_by_slice = []
@@ -56,7 +57,7 @@ def track_instances(tile):
         for i, centroid_current in enumerate(centroids_current):
             for j, centroid_next in enumerate(centroids_next):
                 dist = cdist([centroid_current], [centroid_next], 'euclidean')[0][0]
-                if dist < 50:  # Threshold for considering two centroids to be the same object
+                if dist < distance_threshold:  # Adaptive Threshold for considering two centroids to be the same object
                     G.add_edge((z, i), (z + 1, j), weight=1.0 / (1.0 + dist))
 
     paths = list(nx.connected_components(G.to_undirected()))
@@ -73,38 +74,32 @@ def track_instances(tile):
 
     print(f"Total number of unique objects: {label_counter - 1}")
 
-    # Generate distinct colors using distinctipy (for internal use)
-    unique_labels = np.unique(new_labels)
-    num_unique_labels = len(unique_labels) - 1  # Subtract 1 to exclude the background label 0
-    print(f"Number of unique labels (excluding background): {num_unique_labels}")
-
-    print("Generating distinct colors...")
-    colors = distinctipy.get_colors(num_unique_labels)
-
-    # Internal mapping of labels to colors (not saved, just for validation if needed)
-    color_map = {label: colors[i - 1] for i, label in enumerate(unique_labels) if label != 0}
-
     return new_labels
 
-def merge_2d_to_3d(input_dir, output_dir):
+def process_tile(tile_file, input_dir, output_dir, distance_threshold):
+    print(f"Processing tile: {tile_file}")
+    tile = cp.array(load_tile(os.path.join(input_dir, tile_file)))
+
+    new_labels = track_instances(cp.asnumpy(tile), distance_threshold)
+
+    # Save the labeled image only
+    save_tile(os.path.join(output_dir, f"merged_{tile_file}"), new_labels)
+    clear_gpu_memory()
+
+def merge_2d_to_3d(input_dir, output_dir, distance_threshold, batch_size):
     os.makedirs(output_dir, exist_ok=True)
     files = sorted([f for f in os.listdir(input_dir) if f.endswith('.npy')])
     print(f"Found {len(files)} files to process")
 
-    for tile_file in tqdm(files, desc="Processing tiles"):
-        print(f"Processing tile: {tile_file}")
-        tile = cp.array(load_tile(os.path.join(input_dir, tile_file)))
+    for batch_start in tqdm(range(0, len(files), batch_size), desc="Processing batches"):
+        batch_files = files[batch_start:batch_start + batch_size]
 
-        new_labels = track_instances(cp.asnumpy(tile))
-
-        # Save the labeled image only
-        save_tile(os.path.join(output_dir, f"merged_{tile_file}"), new_labels)
-        clear_gpu_memory()
+        for tile_file in batch_files:
+            process_tile(tile_file, input_dir, output_dir, distance_threshold)
 
 if __name__ == "__main__":
     args = get_args()
     print(f"Input directory: {args.input_dir}")
     print(f"Output directory: {args.output_dir}")
-    merge_2d_to_3d(args.input_dir, args.output_dir)
+    merge_2d_to_3d(args.input_dir, args.output_dir, args.distance_threshold, args.batch_size)
     print("Processing complete.")
-

@@ -50,7 +50,7 @@ def load_sam_results(sam_dir):
     logging.info(f"Loaded {len(sam_results)} SAM result files.")
     return sam_results
 
-def extract_centroids_and_points(sam_results, min_seg_size, min_area_threshold=40):
+def extract_centroids_and_points(sam_results, min_seg_size):
     """
     Extracts centroids and points from SAM results, with a separate pass to remove small masks.
 
@@ -69,7 +69,7 @@ def extract_centroids_and_points(sam_results, min_seg_size, min_area_threshold=4
     all_points = []
     all_point_labels = []
     cleaned_sam_results = []
-
+    min_area_threshold=40
     for tile_idx, tile in enumerate(tqdm(sam_results, desc="Processing tiles")):
         cleaned_tile = []
 

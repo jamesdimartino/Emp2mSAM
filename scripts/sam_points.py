@@ -81,8 +81,13 @@ def extract_centroids_and_points(sam_results):
                 centroid = prop.centroid
                 slice_points.append([[centroid[1], centroid[0]]])  # X, Y coordinates
                 slice_point_labels.append([1])  # Positive prompt
+
+                # Remove all voxels of the segment used as a point prompt
+                cleaned_slice[z_slice == prop.label] = 0  # Set voxels to zero
+                # Continue with original segment assignment (only for segments not used as prompts)
                 cleaned_slice[z_slice == prop.label] = instance_number
                 instance_number += 1
+
             tile_points.append(slice_points)
             tile_point_labels.append(slice_point_labels)
             cleaned_tile.append(cleaned_slice)

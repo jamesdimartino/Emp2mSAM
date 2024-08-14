@@ -50,12 +50,14 @@ def load_sam_results(sam_dir):
     logging.info(f"Loaded {len(sam_results)} SAM result files.")
     return sam_results
 
-def extract_centroids_and_points(sam_results):
+def extract_centroids_and_points(sam_results, min_seg_size, min_area_threshold=40):
     """
-    Extracts centroids and points from SAM results.
+    Extracts centroids and points from SAM results, with a separate pass to remove small masks.
 
     Args:
         sam_results (list of np.ndarray): List of SAM result files.
+        min_seg_size (int): Minimum pixel area for a mask to be re-run with a point prompt.
+        min_area_threshold (int): Minimum area (in pixels) for masks to be retained in the cleaned results.
 
     Returns:
         tuple:
@@ -67,33 +69,51 @@ def extract_centroids_and_points(sam_results):
     all_points = []
     all_point_labels = []
     cleaned_sam_results = []
+
     for tile_idx, tile in enumerate(tqdm(sam_results, desc="Processing tiles")):
+        cleaned_tile = []
+
+        # First loop: Remove all masks under min_area_threshold
+        for z_idx, z_slice in enumerate(tile):
+            cleaned_slice = np.zeros_like(z_slice)
+            props = regionprops(z_slice)
+            for prop in props:
+                if prop.area >= min_area_threshold:
+                    cleaned_slice[z_slice == prop.label] = prop.label  # Retain only large masks
+            cleaned_tile.append(cleaned_slice)
+        
+        # Initialize storage for points and labels after filtering small masks
         tile_points = []
         tile_point_labels = []
-        cleaned_tile = []
-        for z_idx, z_slice in enumerate(tile):
+
+        # Second loop: Extract centroids and points for small masks (min_seg_size)
+        for z_idx, z_slice in enumerate(cleaned_tile):
             props = regionprops(z_slice)
             slice_points = []
             slice_point_labels = []
-            cleaned_slice = np.zeros_like(z_slice)
+            new_cleaned_slice = np.zeros_like(z_slice)
             instance_number = 1
             for prop in props:
-                centroid = prop.centroid
-                slice_points.append([[centroid[1], centroid[0]]])  # X, Y coordinates
-                slice_point_labels.append([1])  # Positive prompt
+                if prop.area < min_seg_size:
+                    centroid = prop.centroid
+                    slice_points.append([[centroid[1], centroid[0]]])  # X, Y coordinates
+                    slice_point_labels.append([1])  # Positive prompt
 
-                # Remove all voxels of the segment used as a point prompt
-                cleaned_slice[z_slice == prop.label] = 0  # Set voxels to zero
-                # Continue with original segment assignment (only for segments not used as prompts)
-                cleaned_slice[z_slice == prop.label] = instance_number
-                instance_number += 1
+                    # Remove all voxels of the segment used as a point prompt
+                    new_cleaned_slice[z_slice == prop.label] = 0  # Set voxels to zero
+                else:
+                    # Reassign label to the remaining segments
+                    new_cleaned_slice[z_slice == prop.label] = instance_number
+                    instance_number += 1
 
             tile_points.append(slice_points)
             tile_point_labels.append(slice_point_labels)
-            cleaned_tile.append(cleaned_slice)
+            cleaned_tile[z_idx] = new_cleaned_slice  # Replace with the newly cleaned slice
+        
         all_points.append(tile_points)
         all_point_labels.append(tile_point_labels)
         cleaned_sam_results.append(np.array(cleaned_tile))
+    
     logging.info("Centroids and points extraction completed.")
     return all_points, all_point_labels, cleaned_sam_results
 

@@ -13,7 +13,7 @@ def get_args():
     parser = argparse.ArgumentParser(description="Merge 2D instance segmentations into 3D using an object tracking-based approach.")
     parser.add_argument('input_dir', type=str, help='Directory containing input .npy files')
     parser.add_argument('output_dir', type=str, help='Directory to save output .npy files')
-    parser.add_argument('--distance_threshold', type=float, default=50, help='Distance threshold for centroid matching')
+    parser.add_argument('--distance_threshold', type=float, default=20, help='Distance threshold for centroid matching')
     parser.add_argument('--batch_size', type=int, default=10, help='Number of tiles to process in a batch')
     return parser.parse_args()
 

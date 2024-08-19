@@ -50,72 +50,61 @@ def load_sam_results(sam_dir):
     logging.info(f"Loaded {len(sam_results)} SAM result files.")
     return sam_results
 
-def extract_centroids_and_points(sam_results, min_seg_size):
+def extract_centroids_and_points(tile, min_seg_size):
     """
-    Extracts centroids and points from SAM results, with a separate pass to remove small masks.
+    Extracts centroids and points from a single tile, with a separate pass to remove small masks.
 
     Args:
-        sam_results (list of np.ndarray): List of SAM result files.
+        tile (np.ndarray): The tile to process.
         min_seg_size (int): Minimum pixel area for a mask to be re-run with a point prompt.
-        min_area_threshold (int): Minimum area (in pixels) for masks to be retained in the cleaned results.
 
     Returns:
         tuple:
-            - all_points (list): List of points for small masks.
-            - all_point_labels (list): List of point labels for small masks.
-            - cleaned_sam_results (list of np.ndarray): List of cleaned SAM results with all masks retained.
+            - tile_points (list): List of points for small masks.
+            - tile_point_labels (list): List of point labels for small masks.
+            - cleaned_tile (np.ndarray): Cleaned tile with all masks retained.
     """
-    logging.info("Extracting centroids and points from SAM results...")
-    all_points = []
-    all_point_labels = []
-    cleaned_sam_results = []
-    min_area_threshold=40
-    for tile_idx, tile in enumerate(tqdm(sam_results, desc="Processing tiles")):
-        cleaned_tile = []
+    logging.info("Extracting centroids and points from tile...")
+    tile_points = []
+    tile_point_labels = []
+    cleaned_tile = []
+    min_area_threshold = 40
 
-        # First loop: Remove all masks under min_area_threshold
-        for z_idx, z_slice in enumerate(tile):
-            cleaned_slice = np.zeros_like(z_slice)
-            props = regionprops(z_slice)
-            for prop in props:
-                if prop.area >= min_area_threshold:
-                    cleaned_slice[z_slice == prop.label] = prop.label  # Retain only large masks
-            cleaned_tile.append(cleaned_slice)
-        
-        # Initialize storage for points and labels after filtering small masks
-        tile_points = []
-        tile_point_labels = []
+    # First loop: Remove all masks under min_area_threshold
+    for z_idx, z_slice in enumerate(tile):
+        cleaned_slice = np.zeros_like(z_slice)
+        props = regionprops(z_slice)
+        for prop in props:
+            if prop.area >= min_area_threshold:
+                cleaned_slice[z_slice == prop.label] = prop.label  # Retain only large masks
+        cleaned_tile.append(cleaned_slice)
 
-        # Second loop: Extract centroids and points for small masks (min_seg_size)
-        for z_idx, z_slice in enumerate(cleaned_tile):
-            props = regionprops(z_slice)
-            slice_points = []
-            slice_point_labels = []
-            new_cleaned_slice = np.zeros_like(z_slice)
-            instance_number = 1
-            for prop in props:
-                if prop.area < min_seg_size:
-                    centroid = prop.centroid
-                    slice_points.append([[centroid[1], centroid[0]]])  # X, Y coordinates
-                    slice_point_labels.append([1])  # Positive prompt
+    # Second loop: Extract centroids and points for small masks (min_seg_size)
+    for z_idx, z_slice in enumerate(cleaned_tile):
+        props = regionprops(z_slice)
+        slice_points = []
+        slice_point_labels = []
+        new_cleaned_slice = np.zeros_like(z_slice)
+        instance_number = 1
+        for prop in props:
+            if prop.area < min_seg_size:
+                centroid = prop.centroid
+                slice_points.append([[centroid[1], centroid[0]]])  # X, Y coordinates
+                slice_point_labels.append([1])  # Positive prompt
 
-                    # Remove all voxels of the segment used as a point prompt
-                    new_cleaned_slice[z_slice == prop.label] = 0  # Set voxels to zero
-                else:
-                    # Reassign label to the remaining segments
-                    new_cleaned_slice[z_slice == prop.label] = instance_number
-                    instance_number += 1
+                # Remove all voxels of the segment used as a point prompt
+                new_cleaned_slice[z_slice == prop.label] = 0  # Set voxels to zero
+            else:
+                # Reassign label to the remaining segments
+                new_cleaned_slice[z_slice == prop.label] = instance_number
+                instance_number += 1
 
-            tile_points.append(slice_points)
-            tile_point_labels.append(slice_point_labels)
-            cleaned_tile[z_idx] = new_cleaned_slice  # Replace with the newly cleaned slice
-        
-        all_points.append(tile_points)
-        all_point_labels.append(tile_point_labels)
-        cleaned_sam_results.append(np.array(cleaned_tile))
-    
-    logging.info("Centroids and points extraction completed.")
-    return all_points, all_point_labels, cleaned_sam_results
+        tile_points.append(slice_points)
+        tile_point_labels.append(slice_point_labels)
+        cleaned_tile[z_idx] = new_cleaned_slice  # Replace with the newly cleaned slice
+
+    logging.info("Centroids and points extraction for tile completed.")
+    return tile_points, tile_point_labels, np.array(cleaned_tile)
 
 def run_sam_inference(predictor, image, points, point_labels, batch_size=1):
     """
@@ -155,19 +144,19 @@ def process_and_save_tile(predictor, raw_tile, points, point_labels, cleaned_sam
     concatenated_results = np.zeros((raw_tile.shape[0], raw_tile.shape[1], raw_tile.shape[2]), dtype=np.uint32)
     max_uint32 = np.iinfo(np.uint32).max
     for z_idx in range(raw_tile.shape[0]):
-        if not points[tile_idx][z_idx]:
+        if not points[z_idx]:
             logging.info(f"Skipping SAM inference for tile {tile_idx}, Z-plane {z_idx} due to no points")
-            concatenated_results[z_idx, :, :] = cleaned_sam_results[tile_idx][z_idx]
+            concatenated_results[z_idx, :, :] = cleaned_sam_results[z_idx]
             continue
 
         image = raw_tile[z_idx, :, :]
         logging.info(f"Running SAM inference for tile {tile_idx}, Z-plane {z_idx}")
-        sam_result = run_sam_inference(predictor, image, points[tile_idx][z_idx], point_labels[tile_idx][z_idx])
+        sam_result = run_sam_inference(predictor, image, points[z_idx], point_labels[z_idx])
 
-        max_label = cleaned_sam_results[tile_idx][z_idx].max()
+        max_label = cleaned_sam_results[z_idx].max()
         sam_result[sam_result > 0] += max_label
 
-        concatenated_result = cleaned_sam_results[tile_idx][z_idx] + sam_result
+        concatenated_result = cleaned_sam_results[z_idx] + sam_result
 
         # Ensure no pixel values exceed the maximum value for np.uint32
         concatenated_result = np.clip(concatenated_result, 0, max_uint32)
@@ -194,14 +183,16 @@ def main(sam_dir, raw_dir, output_dir, min_seg_size):
     logging.info(f"Using device: {device}")
 
     sam_results = load_sam_results(sam_dir)
-    points, point_labels, cleaned_sam_results = extract_centroids_and_points(sam_results)
-
     predictor = util.get_sam_model("vit_l_em_organelles", device=device)
 
     raw_files = sorted([f for f in os.listdir(raw_dir) if f.endswith('.npy')])
     for tile_idx, raw_file in enumerate(tqdm(raw_files, desc="Processing raw files")):
         raw_path = os.path.join(raw_dir, raw_file)
         raw_tile = load_tile(raw_path)
+
+        # Extract centroids and points just before running inference on the tile
+        points, point_labels, cleaned_sam_results = extract_centroids_and_points(sam_results[tile_idx], min_seg_size)
+
         process_and_save_tile(predictor, raw_tile, points, point_labels, cleaned_sam_results, tile_idx, output_dir)
         print_memory_usage()
 

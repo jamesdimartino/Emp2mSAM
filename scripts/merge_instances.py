@@ -50,16 +50,26 @@ def track_instances(tile, distance_threshold):
 
     G = nx.DiGraph()
 
-    for z in tqdm(range(z_slices - 1), desc="Tracking instances"):
+    for z in tqdm(range(z_slices - 2), desc="Tracking instances"):
         centroids_current = centroids_by_slice[z]
         centroids_next = centroids_by_slice[z + 1]
+        centroids_next_next = centroids_by_slice[z + 2]
 
         for i, centroid_current in enumerate(centroids_current):
             for j, centroid_next in enumerate(centroids_next):
                 dist = cdist([centroid_current], [centroid_next], 'euclidean')[0][0]
-                if dist < distance_threshold:  # Adaptive Threshold for considering two centroids to be the same object
-                    G.add_edge((z, i), (z + 1, j), weight=1.0 / (1.0 + dist))
+                if dist < distance_threshold:
+                    # Check if the instances in the next slice merge into one instance in the subsequent slice
+                    merged = False
+                    for k, centroid_next_next in enumerate(centroids_next_next):
+                        dist_next = cdist([centroid_next], [centroid_next_next], 'euclidean')[0][0]
+                        if dist_next < distance_threshold:
+                            merged = True
+                            break
+                    if merged:
+                        G.add_edge((z, i), (z + 1, j), weight=1.0 / (1.0 + dist))
 
+    # Convert the graph to undirected to find connected components
     paths = list(nx.connected_components(G.to_undirected()))
 
     new_labels = np.zeros_like(tile)
@@ -75,7 +85,6 @@ def track_instances(tile, distance_threshold):
     print(f"Total number of unique objects: {label_counter - 1}")
 
     return new_labels
-
 def process_tile(tile_file, input_dir, output_dir, distance_threshold):
     print(f"Processing tile: {tile_file}")
     tile = cp.array(load_tile(os.path.join(input_dir, tile_file)))

@@ -25,43 +25,7 @@ def run_empanada_inference(tile, config_path, temp_tile_path, tile_idx, args):
     io.imsave(temp_tile_path, tile)
 
     # Build the command with optional arguments
-    command = f"python pdl2_inference3d.py {config_path} {temp_tile_path}"
-    if args.data_key:
-        command += f" -data-key {args.data_key}"
-    if args.mode:
-        command += f" -mode {args.mode}"
-    if args.qlen:
-        command += f" -qlen {args.qlen}"
-    if args.label_divisor:
-        command += f" -nmax {args.label_divisor}"
-    if args.seg_thr:
-        command += f" -seg-thr {args.seg_thr}"
-    if args.nms_thr:
-        command += f" -nms-thr {args.nms_thr}"
-    if args.nms_kernel:
-        command += f" -nms-kernel {args.nms_kernel}"
-    if args.iou_thr:
-        command += f" -iou-thr {args.iou_thr}"
-    if args.ioa_thr:
-        command += f" -ioa-thr {args.ioa_thr}"
-    if args.pixel_vote_thr:
-        command += f" -pixel-vote-thr {args.pixel_vote_thr}"
-    if args.cluster_iou_thr:
-        command += f" -cluster-iou-thr {args.cluster_iou_thr}"
-    if args.min_size:
-        command += f" -min-size {args.min_size}"
-    if args.min_span:
-        command += f" -min-span {args.min_span}"
-    if args.downsample_f:
-        command += f" -downsample-f {args.downsample_f}"
-    if args.one_view:
-        command += " --one-view"
-    if args.fine_boundaries:
-        command += " --fine-boundaries"
-    if args.use_cpu:
-        command += " --use-cpu"
-    if args.save_panoptic:
-        command += " --save-panoptic"
+    command = f"python pdl2_inference3d.py {config_path} {temp_tile_path} -mode stack"
     print(f"Executing command: {command}")
     os.system(command)
 

@@ -24,7 +24,7 @@ def parse_args():
     parser.add_argument('-data-key', type=str, metavar='data-key', default='em',
                         help='Key in zarr volume (if volume_path is a zarr). For multiple keys, separate with a comma.')
     parser.add_argument('-mode', type=str, dest='mode', metavar='inference_mode', choices=['orthoplane', 'stack'],
-                        default='orthoplane', help='Pick orthoplane (xy, xz, yz) or stack (xy)')
+                        default='stack', help='Pick orthoplane (xy, xz, yz) or stack (xy)')
     parser.add_argument('-qlen', type=int, dest='qlen', metavar='qlen', choices=[1, 3, 5, 7, 9, 11],
                         default=3, help='Length of median filtering queue, an odd integer')
     parser.add_argument('-nmax', type=int, dest='label_divisor', metavar='label_divisor',
